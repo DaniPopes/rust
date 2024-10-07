@@ -26,8 +26,10 @@ fn test_find() {
 #[test]
 fn test_rfind() {
     assert_eq!("hello".rfind('l'), Some(3));
+    assert_eq!("hello".rfind('l'.as_ascii().unwrap()), Some(3));
     assert_eq!("hello".rfind(|c: char| c == 'o'), Some(4));
     assert!("hello".rfind('x').is_none());
+    assert!("hello".rfind('x'.as_ascii().unwrap()).is_none());
     assert!("hello".rfind(|c: char| c == 'x').is_none());
     assert_eq!("ประเทศไทย中华Việt Nam".rfind('华'), Some(30));
     assert_eq!("ประเทศไทย中华Việt Nam".rfind(|c: char| c == '华'), Some(30));
@@ -788,6 +790,7 @@ fn test_trim_start_matches() {
     assert_eq!("foo *** ".trim_start_matches(chars), "foo *** ");
 
     assert_eq!("11foo1bar11".trim_start_matches('1'), "foo1bar11");
+    assert_eq!("11foo1bar11".trim_start_matches('1'.as_ascii().unwrap()), "foo1bar11");
     let chars: &[char] = &['1', '2'];
     assert_eq!("12foo1bar12".trim_start_matches(chars), "foo1bar12");
     assert_eq!("123foo1bar123".trim_start_matches(|c: char| c.is_numeric()), "foo1bar123");
@@ -803,6 +806,7 @@ fn test_trim_end_matches() {
     assert_eq!(" *** foo".trim_end_matches(chars), " *** foo");
 
     assert_eq!("11foo1bar11".trim_end_matches('1'), "11foo1bar");
+    assert_eq!("11foo1bar11".trim_end_matches('1'.as_ascii().unwrap()), "11foo1bar");
     let chars: &[char] = &['1', '2'];
     assert_eq!("12foo1bar12".trim_end_matches(chars), "12foo1bar");
     assert_eq!("123foo1bar123".trim_end_matches(|c: char| c.is_numeric()), "123foo1bar");
@@ -818,6 +822,7 @@ fn test_trim_matches() {
     assert_eq!("foo".trim_matches(chars), "foo");
 
     assert_eq!("11foo1bar11".trim_matches('1'), "foo1bar");
+    assert_eq!("11foo1bar11".trim_matches('1'.as_ascii().unwrap()), "foo1bar");
     let chars: &[char] = &['1', '2'];
     assert_eq!("12foo1bar12".trim_matches(chars), "foo1bar");
     assert_eq!("123foo1bar123".trim_matches(|c: char| c.is_numeric()), "foo1bar");
@@ -1062,6 +1067,11 @@ fn test_contains_char() {
     assert!("a".contains('a'));
     assert!(!"abc".contains('d'));
     assert!(!"".contains('a'));
+
+    assert!("abc".contains('b'.as_ascii().unwrap()));
+    assert!("a".contains('a'.as_ascii().unwrap()));
+    assert!(!"abc".contains('d'.as_ascii().unwrap()));
+    assert!(!"".contains('a'.as_ascii().unwrap()));
 }
 
 #[test]

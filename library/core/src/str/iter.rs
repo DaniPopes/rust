@@ -14,7 +14,7 @@ use crate::iter::{
 use crate::num::NonZero;
 use crate::ops::Try;
 use crate::slice::{self, Split as SliceSplit};
-use crate::{char as char_mod, option};
+use crate::{ascii, char as char_mod, option};
 
 /// An iterator over the [`char`]s of a string slice.
 ///
@@ -1162,7 +1162,7 @@ generate_pattern_iterators! {
 #[stable(feature = "rust1", since = "1.0.0")]
 #[must_use = "iterators are lazy and do nothing unless consumed"]
 #[derive(Clone, Debug)]
-pub struct Lines<'a>(pub(super) Map<SplitInclusive<'a, char>, LinesMap>);
+pub struct Lines<'a>(pub(super) Map<SplitInclusive<'a, ascii::Char>, LinesMap>);
 
 #[stable(feature = "rust1", since = "1.0.0")]
 impl<'a> Iterator for Lines<'a> {

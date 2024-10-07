@@ -40,6 +40,7 @@
 #![feature(local_waker)]
 #![feature(vec_pop_if)]
 #![feature(unique_rc_arc)]
+#![feature(ascii_char)]
 #![allow(internal_features)]
 #![deny(fuzzy_provenance_casts)]
 #![deny(unsafe_op_in_unsafe_fn)]

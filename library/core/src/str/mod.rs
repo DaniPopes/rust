@@ -1071,6 +1071,7 @@ impl str {
     #[stable(feature = "rust1", since = "1.0.0")]
     #[inline]
     pub fn lines(&self) -> Lines<'_> {
+        // Lines(self.split_inclusive(ascii::Char::LineFeed).map(LinesMap))
         Lines(self.split_inclusive('\n').map(LinesMap))
     }
 
@@ -2785,11 +2786,10 @@ impl Default for &mut str {
 }
 
 impl_fn_for_zst! {
-    /// A nameable, cloneable fn type
     #[derive(Clone)]
     struct LinesMap impl<'a> Fn = |line: &'a str| -> &'a str {
-        let Some(line) = line.strip_suffix('\n') else { return line };
-        let Some(line) = line.strip_suffix('\r') else { return line };
+        let Some(line) = line.strip_suffix(ascii::Char::LineFeed) else { return line };
+        let Some(line) = line.strip_suffix(ascii::Char::CarriageReturn) else { return line };
         line
     };
 
