@@ -316,6 +316,8 @@ pub mod default;
 pub mod error;
 pub mod marker;
 pub mod ops;
+#[unstable(feature = "peel", issue = "none")]
+pub mod peel;
 
 /* Core types and methods on primitives */
 

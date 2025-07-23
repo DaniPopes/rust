@@ -8,6 +8,7 @@
 
 use super::*;
 use crate::hint::unreachable_unchecked;
+use crate::peel::{Peel, peel};
 use crate::ptr::NonNull;
 
 #[lang = "format_placeholder"]
@@ -61,6 +62,10 @@ pub struct Argument<'a> {
 }
 
 macro_rules! argument_new {
+    (@peel $t:ty, $x:expr, $tr:ident) => {
+        argument_new!(<$t>::Peeled, peel($x), <<$t>::Peeled as $tr>::fmt)
+    };
+
     ($t:ty, $x:expr, $f:expr) => {
         Argument {
             // INVARIANT: this creates an `ArgumentType<'a>` from a `&'a T` and
@@ -106,45 +111,64 @@ macro_rules! argument_new {
 }
 
 impl Argument<'_> {
+    #[rustc_const_stable_indirect]
+    #[rustc_allow_const_fn_unstable(peel, fmt_internals, const_trait_impl)]
     #[inline]
-    pub const fn new_display<T: Display>(x: &T) -> Argument<'_> {
-        argument_new!(T, x, <T as Display>::fmt)
+    pub const fn new_display<T: ~const Peel<Peeled: Display>>(x: &T) -> Argument<'_> {
+        argument_new!(@peel T, x, Display)
     }
+    #[rustc_const_stable_indirect]
+    #[rustc_allow_const_fn_unstable(peel, fmt_internals, const_trait_impl)]
     #[inline]
-    pub const fn new_debug<T: Debug>(x: &T) -> Argument<'_> {
-        argument_new!(T, x, <T as Debug>::fmt)
+    pub const fn new_debug<T: ~const Peel<Peeled: Debug>>(x: &T) -> Argument<'_> {
+        argument_new!(@peel T, x, Debug)
     }
+    #[rustc_const_stable_indirect]
+    #[rustc_allow_const_fn_unstable(peel, fmt_internals, const_trait_impl)]
     #[inline]
-    pub const fn new_debug_noop<T: Debug>(x: &T) -> Argument<'_> {
-        argument_new!(T, x, |_: &T, _| Ok(()))
+    pub const fn new_debug_noop<T: ~const Peel<Peeled: Debug>>(x: &T) -> Argument<'_> {
+        argument_new!(T::Peeled, peel(x), |_: &T::Peeled, _| Ok(()))
     }
+    #[rustc_const_stable_indirect]
+    #[rustc_allow_const_fn_unstable(peel, fmt_internals, const_trait_impl)]
     #[inline]
-    pub const fn new_octal<T: Octal>(x: &T) -> Argument<'_> {
-        argument_new!(T, x, <T as Octal>::fmt)
+    pub const fn new_octal<T: ~const Peel<Peeled: Octal>>(x: &T) -> Argument<'_> {
+        argument_new!(@peel T, x, Octal)
     }
+    #[rustc_const_stable_indirect]
+    #[rustc_allow_const_fn_unstable(peel, fmt_internals, const_trait_impl)]
     #[inline]
-    pub const fn new_lower_hex<T: LowerHex>(x: &T) -> Argument<'_> {
-        argument_new!(T, x, <T as LowerHex>::fmt)
+    pub const fn new_lower_hex<T: ~const Peel<Peeled: LowerHex>>(x: &T) -> Argument<'_> {
+        argument_new!(@peel T, x, LowerHex)
     }
+    #[rustc_const_stable_indirect]
+    #[rustc_allow_const_fn_unstable(peel, fmt_internals, const_trait_impl)]
     #[inline]
-    pub const fn new_upper_hex<T: UpperHex>(x: &T) -> Argument<'_> {
-        argument_new!(T, x, <T as UpperHex>::fmt)
+    pub const fn new_upper_hex<T: ~const Peel<Peeled: UpperHex>>(x: &T) -> Argument<'_> {
+        argument_new!(@peel T, x, UpperHex)
     }
     #[inline]
     pub const fn new_pointer<T: Pointer>(x: &T) -> Argument<'_> {
+        // Does not `peel` since `Pointer` is not implemented for `&T` like the other traits are.
         argument_new!(T, x, <T as Pointer>::fmt)
     }
+    #[rustc_const_stable_indirect]
+    #[rustc_allow_const_fn_unstable(peel, fmt_internals, const_trait_impl)]
     #[inline]
-    pub const fn new_binary<T: Binary>(x: &T) -> Argument<'_> {
-        argument_new!(T, x, <T as Binary>::fmt)
+    pub const fn new_binary<T: ~const Peel<Peeled: Binary>>(x: &T) -> Argument<'_> {
+        argument_new!(@peel T, x, Binary)
     }
+    #[rustc_const_stable_indirect]
+    #[rustc_allow_const_fn_unstable(peel, fmt_internals, const_trait_impl)]
     #[inline]
-    pub const fn new_lower_exp<T: LowerExp>(x: &T) -> Argument<'_> {
-        argument_new!(T, x, <T as LowerExp>::fmt)
+    pub const fn new_lower_exp<T: ~const Peel<Peeled: LowerExp>>(x: &T) -> Argument<'_> {
+        argument_new!(@peel T, x, LowerExp)
     }
+    #[rustc_const_stable_indirect]
+    #[rustc_allow_const_fn_unstable(peel, fmt_internals, const_trait_impl)]
     #[inline]
-    pub const fn new_upper_exp<T: UpperExp>(x: &T) -> Argument<'_> {
-        argument_new!(T, x, <T as UpperExp>::fmt)
+    pub const fn new_upper_exp<T: ~const Peel<Peeled: UpperExp>>(x: &T) -> Argument<'_> {
+        argument_new!(@peel T, x, UpperExp)
     }
     #[inline]
     #[track_caller]
